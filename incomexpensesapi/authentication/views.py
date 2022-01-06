@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics, status, views
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-from .serializers import registerSerializer, emailVerificationSerializer
+from .serializers import registerSerializer, emailVerificationSerializer, loginSerializer
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
@@ -73,3 +73,14 @@ class VerifyEmail(views.APIView):
 
         except jwt.exceptions.DecodeError as e:
             return Response({"Invalid Token, refresh!"}, status.HTTP_400_BAD_REQUEST)
+
+
+class loginview(generics.GenericAPIView):
+    serializer_class = loginSerializer
+
+    def post(self, request):
+        user = request.data
+        serializer = self.serializer_class(data=user)
+        serializer.is_valid(raise_exception=True)
+
+        return Response(serializer.data, status.HTTP_200_OK)
