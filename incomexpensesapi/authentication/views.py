@@ -58,7 +58,6 @@ class VerifyEmail(generics.GenericAPIView):
             if not user.is_verified:
                 user.is_verified = True
                 user.save()
-
             return Response("Congrats fam!, Email activated successfully", status.HTTP_200_OK)
         except jwt.ExpiredSignatureError as e:
             return Response("Activation expired, refresh!", status.HTTP_400_BAD_REQUEST)
