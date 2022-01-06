@@ -71,5 +71,5 @@ class VerifyEmail(views.APIView):
         except jwt.ExpiredSignatureError as e:
             return Response("Activation expired, refresh!", status.HTTP_400_BAD_REQUEST)
 
-        # except jwt.exceptions.DecodeError as e:
-        #     return Response({"Invalid Token, refresh!"}, status.HTTP_400_BAD_REQUEST)
+        except jwt.exceptions.DecodeError as e:
+            return Response({"Invalid Token, refresh!"}, status.HTTP_400_BAD_REQUEST)
