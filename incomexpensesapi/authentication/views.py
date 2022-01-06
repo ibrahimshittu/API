@@ -1,15 +1,16 @@
 from django.shortcuts import render
-from rest_framework import generics, status
+from rest_framework import generics, status, views
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-from .serializers import registerSerializer
+from .serializers import registerSerializer, emailVerificationSerializer
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
 from .utils import Util
-import jwt
 from django.conf import settings
-
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+import jwt
 
 # Create your views here.
 
@@ -47,13 +48,20 @@ class registerView(generics.GenericAPIView):
         return Response({"details": user_data, "message": "chill!, check your email to activate your account"}, status=status.HTTP_200_OK)
 
 
-class VerifyEmail(generics.GenericAPIView):
+class VerifyEmail(views.APIView):
+    serializer_class = emailVerificationSerializer
+    token_param_config = openapi.Parameter(
+        "token", in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, description="")
+
+    @swagger_auto_schema(manual_parameters=[token_param_config])
     def get(self, request):
         token = request.GET.get('token')
 
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY)
+            payload = jwt.decode(
+                token, settings.SECRET_KEY, algorithms="HS256")
             user = User.objects.get(id=payload["user_id"])
+            # print(user)
 
             if not user.is_verified:
                 user.is_verified = True
@@ -63,5 +71,5 @@ class VerifyEmail(generics.GenericAPIView):
         except jwt.ExpiredSignatureError as e:
             return Response("Activation expired, refresh!", status.HTTP_400_BAD_REQUEST)
 
-        except jwt.exceptions.DecodeError as e:
-            return Response("Invali Token, refresh!", status.HTTP_400_BAD_REQUEST)
+        # except jwt.exceptions.DecodeError as e:
+        #     return Response({"Invalid Token, refresh!"}, status.HTTP_400_BAD_REQUEST)
