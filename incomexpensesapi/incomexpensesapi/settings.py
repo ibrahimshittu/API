@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'authentication',
     'rest_framework_simplejwt',
     'expenses',
+    'income',
     'drf_yasg',
 ]
 

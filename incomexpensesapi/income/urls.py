@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import ExpenseListAPIView, ExpenseDetailsAPIView
+from .views import IncomeListAPIView, IncomeDetailsAPIView
 
 urlpatterns = [
-    path('', ExpenseListAPIView.as_view(), name="expenses"),
-    path('<int:id>/', ExpenseDetailsAPIView.as_view(), name="expense"),
+    path('', IncomeListAPIView.as_view(), name="incomes"),
+    path('<int:id>/', IncomeDetailsAPIView.as_view(), name="income"),
 ]
