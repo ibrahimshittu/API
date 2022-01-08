@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics, status, views
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-from .serializers import registerSerializer, emailVerificationSerializer, loginSerializer
+from .serializers import registerSerializer, emailVerificationSerializer, loginSerializer, RequestPasswordResetSerializer
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
@@ -12,6 +12,9 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 import jwt
 from .renderers import UserRenderer
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.encoding import smart_str, smart_bytes, DjangoUnicodeDecodeError, force_str, force_bytes
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
 # Create your views here.
 
@@ -86,3 +89,38 @@ class loginview(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         return Response(serializer.data, status.HTTP_200_OK)
+
+
+class RequestPasswordReset(generics.GenericAPIView):
+    serializer_class = RequestPasswordResetSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        email = request.data.get('email', '')
+
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email=email)
+
+            uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
+            token = PasswordResetTokenGenerator().make_token(user)
+            current_site = get_current_site(request=request).domain
+            relativeLink = reverse("password_reset_confirm", kwargs={
+                "uidb64": uidb64, "token": token})
+
+            absurl = 'http://' + current_site + relativeLink
+
+            email_body = "Hi, " + user.username + \
+                " Use the link below to reset your password: \n" + absurl
+
+            data = {
+                "to_email": user.email, "email_body": email_body, "email_subject": "Reset Your Password"
+            }
+            Util.send_mail(data)
+        return Response({"success": "You have been sent a password reset email"}, status.HTTP_200_OK)
+
+
+class PasswordTokenCheckAPIView(generics.GenericAPIView):
+
+    def get(self, request, uidb64, token):
+        # password = request.GET.get('token')
+        pass

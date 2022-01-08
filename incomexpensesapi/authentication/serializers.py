@@ -1,6 +1,10 @@
 from rest_framework import serializers
 from django.contrib import auth
 from rest_framework.exceptions import AuthenticationFailed
+from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
+from .utils import Util
+
 from .models import User
 
 
@@ -69,3 +73,10 @@ class loginSerializer(serializers.ModelSerializer):
             "username": user.username,
             "tokens":  user.tokens
         }
+
+
+class RequestPasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField(min_length=4)
+
+    class Meta:
+        fields = ['email']
