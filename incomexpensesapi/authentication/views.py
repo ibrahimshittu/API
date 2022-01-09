@@ -50,7 +50,7 @@ class registerView(generics.GenericAPIView):
         }
         Util.send_mail(data)
 
-        return Response({"details": user_data, "message": "chill!, check your email to activate your account"}, status=status.HTTP_200_OK)
+        return Response({"details": user_data, "message": "chill!, check your email to activate your account"}, status=status.HTTP_201_CREATED)
 
 
 class VerifyEmail(views.APIView):
