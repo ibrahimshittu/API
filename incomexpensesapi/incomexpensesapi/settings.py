@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'income',
     'drf_yasg',
     "corsheaders",
+    'userstats'
 ]
 
 SWAGGER_SETTINGS = {
