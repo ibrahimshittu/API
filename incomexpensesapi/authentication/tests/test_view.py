@@ -10,8 +10,7 @@ class Test_view(TestSetup):
             self.register_url, self.user_data, format='json')
 
         self.assertEqual(response.status_code,
-                         status.HTTP_201_CREATED)        # import pdb
-        # pdb.set_trace()
+                         status.HTTP_201_CREATED)
         self.assertEqual(response.data['details']
                          ['email'], self.user_data['email'])
 
@@ -23,8 +22,6 @@ class Test_view(TestSetup):
             self.login, self.user_data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        # import pdb
-        # pdb.set_trace()
 
     def test_user_can_login_verified(self):
 
