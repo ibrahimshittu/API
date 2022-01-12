@@ -29,12 +29,13 @@ class UserManager(BaseUserManager):
             raise ValueError('Users must have a password')
 
         user = self.create_user(
-            email,
+            email=email,
             password=password,
             username=username,
         )
         user.is_admin = True
         user.is_staff = True
+        user.is_superuser = True
         user.save()
         return user
 

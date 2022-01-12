@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from rest_framework import generics, status, views
+from rest_framework import generics, status, views, permissions
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-from .serializers import registerSerializer, emailVerificationSerializer, loginSerializer, RequestPasswordResetSerializer, SetNewPasswordSerializer
+from .serializers import registerSerializer, emailVerificationSerializer, loginSerializer, RequestPasswordResetSerializer, SetNewPasswordSerializer, LogoutSerializer
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
@@ -142,3 +142,15 @@ class SetNewPassword(generics.GenericAPIView):
 
         serializer.is_valid(raise_exception=True)
         return Response({'success': True, 'message': 'Password Reset Successful'}, status.HTTP_200_OK)
+
+
+class LogoutView(generics.GenericAPIView):
+    serializer_class = LogoutSerializer
+
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid()
+        serializer.save()
+        return Response({'success': True, 'message': 'Logout Successful'}, status.HTTP_204_NO_CONTENT)
